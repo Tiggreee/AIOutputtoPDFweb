@@ -7,6 +7,7 @@ const elements = {
   lineSpacing: document.getElementById("lineSpacing"),
   pageFormat: document.getElementById("pageFormat"),
   download: document.getElementById("downloadPdf"),
+  pasteClipboard: document.getElementById("pasteClipboard"),
   status: document.getElementById("status"),
   charCount: document.getElementById("charCount"),
   wordCount: document.getElementById("wordCount"),
@@ -36,9 +37,13 @@ const i18n = {
     labelPageFormat: "Page format",
     labelSourceText: "AI output",
     generatePdf: "Generate PDF",
+    pasteFromClipboard: "Paste from clipboard",
     sourcePlaceholder: "Paste your AI output here...",
     titlePlaceholder: "Quarterly AI Notes",
     emptyError: "Paste some text first.",
+    clipboardEmpty: "Clipboard is empty.",
+    clipboardUnsupported: "Clipboard access requires localhost/https and browser permission.",
+    clipboardPasted: "Clipboard text pasted.",
     pdfOk: "PDF generated successfully.",
     defaultTitle: "AI Output",
     chars: "chars",
@@ -56,9 +61,13 @@ const i18n = {
     labelPageFormat: "Formato de pagina",
     labelSourceText: "Output de IA",
     generatePdf: "Generar PDF",
+    pasteFromClipboard: "Pegar desde portapapeles",
     sourcePlaceholder: "Pega aqui el output de tu IA...",
     titlePlaceholder: "Notas trimestrales de IA",
     emptyError: "Pega primero algo de texto.",
+    clipboardEmpty: "El portapapeles esta vacio.",
+    clipboardUnsupported: "El acceso al portapapeles requiere localhost/https y permiso del navegador.",
+    clipboardPasted: "Texto pegado desde el portapapeles.",
     pdfOk: "PDF generado correctamente.",
     defaultTitle: "Output IA",
     chars: "caracteres",
@@ -76,9 +85,13 @@ const i18n = {
     labelPageFormat: "Formato da pagina",
     labelSourceText: "Saida da IA",
     generatePdf: "Gerar PDF",
+    pasteFromClipboard: "Colar da area de transferencia",
     sourcePlaceholder: "Cole aqui a saida da sua IA...",
     titlePlaceholder: "Notas trimestrais de IA",
     emptyError: "Cole algum texto primeiro.",
+    clipboardEmpty: "A area de transferencia esta vazia.",
+    clipboardUnsupported: "O acesso a area de transferencia requer localhost/https e permissao do navegador.",
+    clipboardPasted: "Texto colado da area de transferencia.",
     pdfOk: "PDF gerado com sucesso.",
     defaultTitle: "Saida de IA",
     chars: "caracteres",
@@ -96,9 +109,13 @@ const i18n = {
     labelPageFormat: "Format de page",
     labelSourceText: "Sortie IA",
     generatePdf: "Generer le PDF",
+    pasteFromClipboard: "Coller depuis le presse-papiers",
     sourcePlaceholder: "Collez ici la sortie de votre IA...",
     titlePlaceholder: "Notes IA trimestrielles",
     emptyError: "Collez d'abord du texte.",
+    clipboardEmpty: "Le presse-papiers est vide.",
+    clipboardUnsupported: "L'acces au presse-papiers exige localhost/https et l'autorisation du navigateur.",
+    clipboardPasted: "Texte colle depuis le presse-papiers.",
     pdfOk: "PDF genere avec succes.",
     defaultTitle: "Sortie IA",
     chars: "caracteres",
@@ -168,6 +185,7 @@ function applyLocaleTexts() {
   elements.labelPageFormat.textContent = t.labelPageFormat;
   elements.labelSourceText.textContent = t.labelSourceText;
   elements.download.textContent = t.generatePdf;
+  elements.pasteClipboard.textContent = t.pasteFromClipboard;
 
   elements.title.placeholder = t.titlePlaceholder;
   elements.text.placeholder = t.sourcePlaceholder;
@@ -247,6 +265,28 @@ function generatePdf() {
   setStatus(activeLocale.pdfOk);
 }
 
+async function pasteFromClipboard() {
+  if (!navigator.clipboard || !window.isSecureContext) {
+    setStatus(activeLocale.clipboardUnsupported, true);
+    return;
+  }
+
+  try {
+    const clipText = await navigator.clipboard.readText();
+
+    if (!clipText || !clipText.trim()) {
+      setStatus(activeLocale.clipboardEmpty, true);
+      return;
+    }
+
+    elements.text.value = clipText;
+    updateStats();
+    setStatus(activeLocale.clipboardPasted);
+  } catch {
+    setStatus(activeLocale.clipboardUnsupported, true);
+  }
+}
+
 function updateLabelsWithValues() {
   elements.labelFontSize.innerHTML = `${activeLocale.labelFontSize}: <span id="fontSizeLabel">${elements.fontSize.value}</span>pt`;
   elements.labelLineSpacing.innerHTML = `${activeLocale.labelLineSpacing}: <span id="lineSpacingLabel">${elements.lineSpacing.value}</span>`;
@@ -265,6 +305,7 @@ async function init() {
 
   elements.text.addEventListener("input", updateStats);
   elements.download.addEventListener("click", generatePdf);
+  elements.pasteClipboard.addEventListener("click", pasteFromClipboard);
 
   elements.fontSize.addEventListener("input", () => {
     updateLabelsWithValues();

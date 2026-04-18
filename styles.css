@@ -199,6 +199,20 @@ textarea {
   background: linear-gradient(180deg, #fff8c8 0%, #f4cd2f 100%);
 }
 
+.secondary-btn {
+  border: 1px solid #5e6f84;
+  border-radius: 3px;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #dfe6ef 100%);
+  color: #1d2d40;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #d3dce8 100%);
+}
+
 .status {
   min-height: 1.2rem;
   margin: 0;
