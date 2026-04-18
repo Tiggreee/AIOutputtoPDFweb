@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classic Draft Printer - AI Output to PDF</title>
+    <meta
+      name="description"
+      content="Convert AI output into clean PDFs with a classic desktop-style interface."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="wallpaper" aria-hidden="true"></div>
+
+    <main class="app-shell" role="main">
+      <section class="xp-window" aria-label="PDF generator workspace">
+        <div class="titlebar">
+          <strong id="windowTitle">Classic Draft Printer</strong>
+          <div class="window-actions" aria-hidden="true">
+            <span class="window-btn">_</span>
+            <span class="window-btn">&#9633;</span>
+            <span class="window-btn close">&#10005;</span>
+          </div>
+        </div>
+
+        <div class="hero-strip">
+          <p id="kickerText">Basic IA setup active</p>
+          <h1 id="heroTitle">AI Output to PDF</h1>
+          <p id="heroSubtitle">
+            Paste content from any AI, customize the format, and export as PDF.
+          </p>
+        </div>
+
+        <div class="workspace">
+          <div class="controls">
+            <label for="docTitle" id="labelDocTitle">Document title</label>
+            <input
+              id="docTitle"
+              type="text"
+              maxlength="120"
+              placeholder="Quarterly AI Notes"
+            />
+
+            <label for="fontSize" id="labelFontSize"
+              >Font size: <span id="fontSizeLabel">12</span>pt</label
+            >
+            <input id="fontSize" type="range" min="10" max="18" value="12" />
+
+            <label for="lineSpacing" id="labelLineSpacing"
+              >Line spacing: <span id="lineSpacingLabel">1.4</span></label
+            >
+            <input id="lineSpacing" type="range" min="1.1" max="1.9" step="0.1" value="1.4" />
+
+            <label for="pageFormat" id="labelPageFormat">Page format</label>
+            <select id="pageFormat">
+              <option value="a4" selected>A4</option>
+              <option value="letter">Letter</option>
+            </select>
+
+            <button id="downloadPdf" class="action-btn">Generate PDF</button>
+            <p id="status" class="status" aria-live="polite"></p>
+          </div>
+
+          <div class="editor-wrap">
+            <label for="sourceText" id="labelSourceText">AI output</label>
+            <textarea
+              id="sourceText"
+              placeholder="Paste your AI output here..."
+              spellcheck="true"
+            ></textarea>
+            <div class="stats">
+              <span id="charCount">0 chars</span>
+              <span id="wordCount">0 words</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
