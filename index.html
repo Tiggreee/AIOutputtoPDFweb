@@ -65,6 +65,18 @@
 
           <div class="editor-wrap">
             <label for="sourceText" id="labelSourceText">AI output</label>
+            <p class="cta-text" id="ctaText">Paste your text here and convert it to PDF.</p>
+
+            <div class="example-box" aria-label="Quick input and output example">
+              <p class="example-title" id="exampleTitle">Quick example</p>
+              <p class="example-label" id="exampleInputLabel">Input</p>
+              <pre id="exampleInput">Meeting summary:
+- Revenue up 8%
+- Next step: launch in Q3</pre>
+              <p class="example-label" id="exampleOutputLabel">Output</p>
+              <p id="exampleOutput">meeting-summary.pdf (formatted and downloadable)</p>
+            </div>
+
             <textarea
               id="sourceText"
               placeholder="Paste your AI output here..."

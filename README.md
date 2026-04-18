@@ -25,11 +25,33 @@ Si llegaste hasta aqui, ya no eres usuario casual: eres del team que si ahonda.
 - Mostrar conteo de caracteres y palabras en vivo.
 - Adaptar el texto de la interfaz segun pais/idioma detectado (con fallback seguro).
 
-### Stack y tecnologias
+### Por que existe
+- Ahorrar tiempo cuando necesitas llevar texto de IA a un entregable formal.
+- Evitar friccion de copiar en procesadores externos para exportar PDF.
+- Mantener privacidad local: el texto se procesa en el navegador.
+
+### Como funciona
+1. Escribes o pegas contenido (manual o portapapeles).
+2. Ajustas formato rapido (titulo, fuente, espaciado, tamano de pagina).
+3. La app genera el PDF en cliente con jsPDF y descarga directa.
+
+### Como se construyo
+- Base con HTML/CSS/JS vanilla para mantener simplicidad y control.
+- UI inspirada en XP para identidad visual clara y reconocible.
+- Internacionalizacion dinamica con fallback robusto.
+- Publicacion en GitHub Pages con rama dedicada `gh-pages` (sin Actions).
+
+### Tecnologias usadas
 - HTML, CSS, JavaScript vanilla.
 - `jsPDF` (via CDN) para generar PDF en cliente.
 - Geolocalizacion ligera por IP (`ipapi.co`) + fallback a `navigator.language`.
 - GitHub Pages (branch `gh-pages`, modo legacy, sin GitHub Actions).
+
+### Decisiones tecnicas clave
+- Cliente-first: cero backend para bajar complejidad y costos.
+- Fallback de localizacion para no depender de una sola fuente externa.
+- Mensajes de error granulares para mejorar UX y soporte.
+- Script de deploy unico (`deploy-pages.sh`) para reducir errores manuales.
 
 ### UX y seguridad aplicadas
 - Mensajes de estado claros (exito/error) sin colores agresivos.

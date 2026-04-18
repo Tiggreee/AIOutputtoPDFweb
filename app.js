@@ -22,6 +22,12 @@ const elements = {
   labelLineSpacing: document.getElementById("labelLineSpacing"),
   labelPageFormat: document.getElementById("labelPageFormat"),
   labelSourceText: document.getElementById("labelSourceText"),
+  ctaText: document.getElementById("ctaText"),
+  exampleTitle: document.getElementById("exampleTitle"),
+  exampleInputLabel: document.getElementById("exampleInputLabel"),
+  exampleInput: document.getElementById("exampleInput"),
+  exampleOutputLabel: document.getElementById("exampleOutputLabel"),
+  exampleOutput: document.getElementById("exampleOutput"),
   privacyTitle: document.getElementById("privacyTitle"),
   privacyBody: document.getElementById("privacyBody")
 };
@@ -38,6 +44,12 @@ const i18n = {
     labelLineSpacing: "Line spacing",
     labelPageFormat: "Page format",
     labelSourceText: "AI output",
+    ctaText: "Paste your text here and convert it to PDF.",
+    exampleTitle: "Quick example",
+    exampleInputLabel: "Input",
+    exampleInput: "Meeting summary:\n- Revenue up 8%\n- Next step: launch in Q3",
+    exampleOutputLabel: "Output",
+    exampleOutput: "meeting-summary.pdf (formatted and downloadable)",
     generatePdf: "Generate PDF",
     pasteFromClipboard: "Paste from clipboard",
     sourcePlaceholder: "Paste your AI output here...",
@@ -68,6 +80,12 @@ const i18n = {
     labelLineSpacing: "Espaciado de linea",
     labelPageFormat: "Formato de pagina",
     labelSourceText: "Output de IA",
+    ctaText: "Pega tu texto aqui y conviertelo en PDF.",
+    exampleTitle: "Ejemplo rapido",
+    exampleInputLabel: "Entrada",
+    exampleInput: "Resumen de reunion:\n- Ingresos +8%\n- Siguiente paso: lanzamiento en Q3",
+    exampleOutputLabel: "Salida",
+    exampleOutput: "resumen-reunion.pdf (formateado y descargable)",
     generatePdf: "Generar PDF",
     pasteFromClipboard: "Pegar desde portapapeles",
     sourcePlaceholder: "Pega aqui el output de tu IA...",
@@ -98,6 +116,12 @@ const i18n = {
     labelLineSpacing: "Espacamento entre linhas",
     labelPageFormat: "Formato da pagina",
     labelSourceText: "Saida da IA",
+    ctaText: "Cole seu texto aqui e converta para PDF.",
+    exampleTitle: "Exemplo rapido",
+    exampleInputLabel: "Entrada",
+    exampleInput: "Resumo da reuniao:\n- Receita +8%\n- Proximo passo: lancamento no Q3",
+    exampleOutputLabel: "Saida",
+    exampleOutput: "resumo-reuniao.pdf (formatado e baixavel)",
     generatePdf: "Gerar PDF",
     pasteFromClipboard: "Colar da area de transferencia",
     sourcePlaceholder: "Cole aqui a saida da sua IA...",
@@ -128,6 +152,12 @@ const i18n = {
     labelLineSpacing: "Interligne",
     labelPageFormat: "Format de page",
     labelSourceText: "Sortie IA",
+    ctaText: "Collez votre texte ici et convertissez-le en PDF.",
+    exampleTitle: "Exemple rapide",
+    exampleInputLabel: "Entree",
+    exampleInput: "Resume de reunion:\n- Revenus +8 %\n- Etape suivante : lancement au T3",
+    exampleOutputLabel: "Sortie",
+    exampleOutput: "resume-reunion.pdf (mis en forme et telechargeable)",
     generatePdf: "Generer le PDF",
     pasteFromClipboard: "Coller depuis le presse-papiers",
     sourcePlaceholder: "Collez ici la sortie de votre IA...",
@@ -226,6 +256,12 @@ function applyLocaleTexts() {
   elements.labelDocTitle.textContent = t.labelDocTitle;
   elements.labelPageFormat.textContent = t.labelPageFormat;
   elements.labelSourceText.textContent = t.labelSourceText;
+  elements.ctaText.textContent = t.ctaText;
+  elements.exampleTitle.textContent = t.exampleTitle;
+  elements.exampleInputLabel.textContent = t.exampleInputLabel;
+  elements.exampleInput.textContent = t.exampleInput;
+  elements.exampleOutputLabel.textContent = t.exampleOutputLabel;
+  elements.exampleOutput.textContent = t.exampleOutput;
   elements.download.textContent = t.generatePdf;
   elements.pasteClipboard.textContent = t.pasteFromClipboard;
   elements.privacyTitle.textContent = t.privacyTitle;
