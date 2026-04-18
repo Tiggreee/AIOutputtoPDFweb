@@ -1,4 +1,4 @@
-const { jsPDF } = window.jspdf;
+const jsPDF = window.jspdf && window.jspdf.jsPDF;
 
 const elements = {
   title: document.getElementById("docTitle"),
@@ -21,7 +21,9 @@ const elements = {
   labelFontSize: document.getElementById("labelFontSize"),
   labelLineSpacing: document.getElementById("labelLineSpacing"),
   labelPageFormat: document.getElementById("labelPageFormat"),
-  labelSourceText: document.getElementById("labelSourceText")
+  labelSourceText: document.getElementById("labelSourceText"),
+  privacyTitle: document.getElementById("privacyTitle"),
+  privacyBody: document.getElementById("privacyBody")
 };
 
 const i18n = {
@@ -43,8 +45,14 @@ const i18n = {
     emptyError: "Paste some text first.",
     clipboardEmpty: "Clipboard is empty.",
     clipboardUnsupported: "Clipboard access requires localhost/https and browser permission.",
+    clipboardPermissionDenied: "Clipboard permission denied. Allow access and try again.",
+    clipboardReadFailed: "Could not read clipboard right now. Try again.",
     clipboardPasted: "Clipboard text pasted.",
     pdfOk: "PDF generated successfully.",
+    pdfEngineMissing: "PDF engine not available. Reload the page and try again.",
+    pdfGenerationFailed: "Failed to generate PDF. Please retry.",
+    privacyTitle: "Privacy",
+    privacyBody: "Your text stays in your browser. It is not sent to this app server.",
     defaultTitle: "AI Output",
     chars: "chars",
     words: "words"
@@ -67,8 +75,14 @@ const i18n = {
     emptyError: "Pega primero algo de texto.",
     clipboardEmpty: "El portapapeles esta vacio.",
     clipboardUnsupported: "El acceso al portapapeles requiere localhost/https y permiso del navegador.",
+    clipboardPermissionDenied: "Permiso de portapapeles denegado. Habilitalo y vuelve a intentar.",
+    clipboardReadFailed: "No se pudo leer el portapapeles ahora. Intenta de nuevo.",
     clipboardPasted: "Texto pegado desde el portapapeles.",
     pdfOk: "PDF generado correctamente.",
+    pdfEngineMissing: "Motor PDF no disponible. Recarga la pagina e intenta otra vez.",
+    pdfGenerationFailed: "No se pudo generar el PDF. Intenta nuevamente.",
+    privacyTitle: "Privacidad",
+    privacyBody: "Tu texto se queda en tu navegador. Esta app no lo envia a un servidor propio.",
     defaultTitle: "Output IA",
     chars: "caracteres",
     words: "palabras"
@@ -91,8 +105,14 @@ const i18n = {
     emptyError: "Cole algum texto primeiro.",
     clipboardEmpty: "A area de transferencia esta vazia.",
     clipboardUnsupported: "O acesso a area de transferencia requer localhost/https e permissao do navegador.",
+    clipboardPermissionDenied: "Permissao da area de transferencia negada. Habilite e tente novamente.",
+    clipboardReadFailed: "Nao foi possivel ler a area de transferencia agora. Tente novamente.",
     clipboardPasted: "Texto colado da area de transferencia.",
     pdfOk: "PDF gerado com sucesso.",
+    pdfEngineMissing: "Mecanismo de PDF indisponivel. Recarregue a pagina e tente novamente.",
+    pdfGenerationFailed: "Falha ao gerar o PDF. Tente novamente.",
+    privacyTitle: "Privacidade",
+    privacyBody: "Seu texto fica no navegador. Este app nao envia o conteudo para um servidor proprio.",
     defaultTitle: "Saida de IA",
     chars: "caracteres",
     words: "palavras"
@@ -115,8 +135,14 @@ const i18n = {
     emptyError: "Collez d'abord du texte.",
     clipboardEmpty: "Le presse-papiers est vide.",
     clipboardUnsupported: "L'acces au presse-papiers exige localhost/https et l'autorisation du navigateur.",
+    clipboardPermissionDenied: "Autorisation du presse-papiers refusee. Autorisez puis reessayez.",
+    clipboardReadFailed: "Lecture du presse-papiers impossible pour le moment. Reessayez.",
     clipboardPasted: "Texte colle depuis le presse-papiers.",
     pdfOk: "PDF genere avec succes.",
+    pdfEngineMissing: "Moteur PDF indisponible. Rechargez la page puis reessayez.",
+    pdfGenerationFailed: "Echec de generation du PDF. Reessayez.",
+    privacyTitle: "Confidentialite",
+    privacyBody: "Votre texte reste dans votre navigateur. Cette application ne l'envoie pas a son serveur.",
     defaultTitle: "Sortie IA",
     chars: "caracteres",
     words: "mots"
@@ -156,9 +182,23 @@ function mapCountryToLocale(countryCode, languageHint) {
   return i18n.en;
 }
 
+function getPrimaryLanguageHint() {
+  if (Array.isArray(navigator.languages) && navigator.languages.length > 0) {
+    return navigator.languages[0] || "en-US";
+  }
+
+  return navigator.language || "en-US";
+}
+
 async function detectCountryCode() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 1500);
+
   try {
-    const response = await fetch("https://ipapi.co/json/");
+    const response = await fetch("https://ipapi.co/json/", {
+      signal: controller.signal,
+      cache: "no-store"
+    });
 
     if (!response.ok) {
       throw new Error("Geo lookup failed");
@@ -168,6 +208,8 @@ async function detectCountryCode() {
     return data.country_code || "";
   } catch {
     return "";
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -186,6 +228,8 @@ function applyLocaleTexts() {
   elements.labelSourceText.textContent = t.labelSourceText;
   elements.download.textContent = t.generatePdf;
   elements.pasteClipboard.textContent = t.pasteFromClipboard;
+  elements.privacyTitle.textContent = t.privacyTitle;
+  elements.privacyBody.textContent = t.privacyBody;
 
   elements.title.placeholder = t.titlePlaceholder;
   elements.text.placeholder = t.sourcePlaceholder;
@@ -202,7 +246,7 @@ function updateStats() {
 
 function setStatus(message, isError = false) {
   elements.status.textContent = message;
-  elements.status.style.color = isError ? "#ff6f9f" : "#abff4d";
+  elements.status.style.color = isError ? "#8f2c2c" : "#2f6f2f";
 }
 
 function sanitizeFileName(name) {
@@ -226,43 +270,52 @@ function generatePdf() {
   const lineSpacing = Number(elements.lineSpacing.value);
   const format = elements.pageFormat.value;
 
-  const doc = new jsPDF({
-    unit: "pt",
-    format
-  });
-
-  const margin = 54;
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const usableWidth = pageWidth - margin * 2;
-  const usableHeight = pageHeight - margin * 2;
-
-  let y = margin;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(fontSize + 4);
-  doc.text(title, margin, y);
-  y += (fontSize + 8) * lineSpacing;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(fontSize);
-
-  const lines = doc.splitTextToSize(text, usableWidth);
-  const lineHeight = fontSize * lineSpacing;
-
-  for (const line of lines) {
-    if (y + lineHeight > margin + usableHeight) {
-      doc.addPage();
-      y = margin;
-    }
-
-    doc.text(line, margin, y);
-    y += lineHeight;
+  if (!jsPDF) {
+    setStatus(activeLocale.pdfEngineMissing, true);
+    return;
   }
 
-  const safeTitle = sanitizeFileName(title) || "ai-output";
-  doc.save(`${safeTitle}.pdf`);
-  setStatus(activeLocale.pdfOk);
+  try {
+    const doc = new jsPDF({
+      unit: "pt",
+      format
+    });
+
+    const margin = 54;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const usableWidth = pageWidth - margin * 2;
+    const usableHeight = pageHeight - margin * 2;
+
+    let y = margin;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(fontSize + 4);
+    doc.text(title, margin, y);
+    y += (fontSize + 8) * lineSpacing;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(fontSize);
+
+    const lines = doc.splitTextToSize(text, usableWidth);
+    const lineHeight = fontSize * lineSpacing;
+
+    for (const line of lines) {
+      if (y + lineHeight > margin + usableHeight) {
+        doc.addPage();
+        y = margin;
+      }
+
+      doc.text(line, margin, y);
+      y += lineHeight;
+    }
+
+    const safeTitle = sanitizeFileName(title) || "ai-output";
+    doc.save(`${safeTitle}.pdf`);
+    setStatus(activeLocale.pdfOk);
+  } catch {
+    setStatus(activeLocale.pdfGenerationFailed, true);
+  }
 }
 
 async function pasteFromClipboard() {
@@ -282,8 +335,13 @@ async function pasteFromClipboard() {
     elements.text.value = clipText;
     updateStats();
     setStatus(activeLocale.clipboardPasted);
-  } catch {
-    setStatus(activeLocale.clipboardUnsupported, true);
+  } catch (error) {
+    if (error && error.name === "NotAllowedError") {
+      setStatus(activeLocale.clipboardPermissionDenied, true);
+      return;
+    }
+
+    setStatus(activeLocale.clipboardReadFailed, true);
   }
 }
 
@@ -296,7 +354,7 @@ function updateLabelsWithValues() {
 }
 
 async function init() {
-  const localeHint = navigator.language || "en-US";
+  const localeHint = getPrimaryLanguageHint();
   const countryCode = await detectCountryCode();
   activeLocale = mapCountryToLocale(countryCode, localeHint);
 

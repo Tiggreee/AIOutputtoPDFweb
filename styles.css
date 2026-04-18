@@ -229,6 +229,23 @@ textarea {
   font-weight: 700;
 }
 
+.privacy-note {
+  margin: 0 12px 12px;
+  padding: 8px 10px;
+  border: 1px solid #aebed3;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-right-color: #7f9db9;
+  border-bottom-color: #7f9db9;
+  background: #eef3f9;
+  font-size: 0.82rem;
+  color: #334a66;
+}
+
+.privacy-note p {
+  margin: 3px 0 0;
+}
+
 @media (max-width: 900px) {
   .workspace {
     grid-template-columns: 1fr;
